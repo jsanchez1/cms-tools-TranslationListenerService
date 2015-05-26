@@ -1,6 +1,6 @@
 ﻿namespace TranslationListenerService
 {
-    partial class Service1
+    partial class TranslationListener
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,10 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            this.ServiceName = "Service1";
+            this.components = new System.ComponentModel.Container();
+            this.ServiceTimer = new System.Windows.Forms.Timer(this.components);
+            // 
+            // ServiceTimer
+            // 
+            this.ServiceTimer.Tick += new System.EventHandler(this.ServiceTimer_Tick);
+            // 
+            // TranslationListener
+            // 
+            this.ServiceName = "TranslationListener";
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer ServiceTimer;
     }
 }

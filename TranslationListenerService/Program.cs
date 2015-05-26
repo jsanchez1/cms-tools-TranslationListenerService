@@ -17,7 +17,7 @@ namespace TranslationListenerService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[] 
             { 
-                new Service1() 
+                new TranslationListener() 
             };
             ServiceBase.Run(ServicesToRun);
         }
