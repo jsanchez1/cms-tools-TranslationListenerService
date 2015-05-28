@@ -49,5 +49,42 @@ namespace TranslationListenerService.Properties {
                 return ((string)(this["HandbackFolderPath"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=BELGF4ZKM1;Integrated Security=True;Initial Catalog=TranslationDB")]
+        public string ConnectionString {
+            get {
+                return ((string)(this["ConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Localization_GetQueue")]
+        public string StoredProcedureName {
+            get {
+                return ((string)(this["StoredProcedureName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TranslationRequest")]
+        public string TableName {
+            get {
+                return ((string)(this["TableName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TranslationRequestID")]
+        public string PrimaryKey {
+            get {
+                return ((string)(this["PrimaryKey"]));
+            }
+        }
     }
 }

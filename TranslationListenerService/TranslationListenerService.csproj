@@ -70,6 +70,16 @@
       <DependentUpon>Service1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\XMLSerial\LocalizationDatabaseAccess\LocalizationDatabaseAccess.csproj">
+      <Project>{1281b8ea-dad0-4ec2-8aa9-dc6e5edcc167}</Project>
+      <Name>LocalizationDatabaseAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\XMLSerial\XMLSerialization\XMLSerialization.csproj">
+      <Project>{86c7f12d-3754-4028-9325-c0b537619dba}</Project>
+      <Name>XMLSerialization</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
