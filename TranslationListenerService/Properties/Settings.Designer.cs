@@ -86,5 +86,32 @@ namespace TranslationListenerService.Properties {
                 return ((string)(this["PrimaryKey"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("AssignedBatchID")]
+        public string BatchKey {
+            get {
+                return ((string)(this["BatchKey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("InputLangID")]
+        public string InputLCIDKey {
+            get {
+                return ((string)(this["InputLCIDKey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TargetLangID")]
+        public string OuputLCIDKey {
+            get {
+                return ((string)(this["OuputLCIDKey"]));
+            }
+        }
     }
 }

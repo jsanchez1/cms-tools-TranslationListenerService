@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 using System.Configuration;
 using LocalizationDatabaseAccess;
 using XMLSerialization;
-
+using System.Data.SqlClient;
+using System.IO;
 
 namespace TranslationListenerService
 {
@@ -52,17 +53,68 @@ namespace TranslationListenerService
 
 
 
-        #region "Queue scan, batch assignment, and XML file output"
+        #region "Queue processing"
         private void ProcessQueue()
-        {          
-
+        {
             DataTable UnAssignedRequests = access.DataBaseToDataTable();
 
             if (UnAssignedRequests.Rows.Count > 0)
             {
                 DataTable AssignedRequests = AssignBatches(UnAssignedRequests);
-                access.UpdateDataBase(UnAssignedRequests);
+                access.UpdateDataBase(AssignedRequests);
+
+                newFindBatches(AssignedRequests);
+
+                foreach (BatchInfo batch in newFindBatches(AssignedRequests))
+                {
+                    serializer.DataBaseToXMLFile(GetXMLOutputPath(batch), batch.BatchID);
+                }
             }
+        }
+
+
+        private string GetXMLOutputPath(BatchInfo batch)
+        {
+            //"<TargetLangId>_<SourceLangID>_<BatchID>_<DateStamp>.xml"
+            string filename = String.Format("{0}_{1}_{2}_{3:MM-dd-yyyy}", batch.OutputLCID, batch.InputLCID, batch.BatchID, DateTime.Now);
+
+            string path = Path.ChangeExtension(Path.Combine(Properties.Settings.Default.HandoffFolderPath, filename), "xml");
+
+            return path;
+        }
+
+
+        private List<long> FindBatches(DataTable table)
+        {
+
+            var newBatchIDs = (from DataRow row in table.Rows
+                               select ((long)row[Properties.Settings.Default.BatchKey])).Distinct().ToList();
+
+            return newBatchIDs;
+        }
+
+
+        private struct BatchInfo
+        {
+            public long BatchID;
+            public int InputLCID;
+            public int OutputLCID;
+        }
+
+        private List<BatchInfo> newFindBatches(DataTable table)
+        {
+
+            List<BatchInfo> newBatchIDs = (from DataRow row in table.Rows
+                                           select new BatchInfo
+                                           {
+                                               BatchID = (long)row[Properties.Settings.Default.BatchKey],
+                                               InputLCID = (int)row[Properties.Settings.Default.InputLCIDKey],
+                                               OutputLCID = (int)row[Properties.Settings.Default.OuputLCIDKey]
+                                           }).Distinct().ToList();
+
+
+
+            return newBatchIDs;
         }
 
 
@@ -71,9 +123,9 @@ namespace TranslationListenerService
             var simplifiedList = from DataRow row in table.Rows
                                  select new
                                  {
-                                     RequestID = row.Field<long>("TranslationRequestID"),
-                                     InputLCID = row.Field<int>("InputLangID"),
-                                     OutputLCID = row.Field<int>("TargetLangID")
+                                     RequestID = row[access.PrimaryKey],
+                                     InputLCID = row[Properties.Settings.Default.InputLCIDKey],
+                                     OutputLCID = row[Properties.Settings.Default.OuputLCIDKey]
                                  };
 
             var groupedByLCID = from row in simplifiedList
@@ -91,11 +143,11 @@ namespace TranslationListenerService
 
             foreach (var row in groupedByLCID)
             {
-                long newBatchID = access.GenerateNewBatchID("AssignedBatchID");
+                long newBatchID = access.GenerateNewBatchID(Properties.Settings.Default.BatchKey);
 
                 foreach (long request in row.Requests)
                 {
-                    table.Rows.Find(request)["AssignedBatchID"] = newBatchID;
+                    table.Rows.Find(request)[Properties.Settings.Default.BatchKey] = newBatchID;
                 }
 
             }

@@ -27,5 +27,14 @@
     <Setting Name="PrimaryKey" Type="System.String" Scope="Application">
       <Value Profile="(Default)">TranslationRequestID</Value>
     </Setting>
+    <Setting Name="BatchKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AssignedBatchID</Value>
+    </Setting>
+    <Setting Name="InputLCIDKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">InputLangID</Value>
+    </Setting>
+    <Setting Name="OuputLCIDKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">TargetLangID</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
