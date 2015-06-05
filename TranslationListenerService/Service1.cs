@@ -31,7 +31,8 @@ namespace TranslationListenerService
                 connectionString: Properties.Settings.Default.ConnectionString,
                 storedProcedureName: Properties.Settings.Default.StoredProcedureName,
                 tableName: Properties.Settings.Default.TableName,
-                primaryKey: Properties.Settings.Default.PrimaryKey);
+                primaryKey: Properties.Settings.Default.PrimaryKey,
+                batchIDColumn: Properties.Settings.Default.BatchKey);
 
             //Create new XML Serialization object
             serializer = new XMLSerializer(access);
@@ -163,7 +164,7 @@ namespace TranslationListenerService
 
             foreach (var row in groupedByLCID)
             {
-                long newBatchID = access.GenerateNewBatchID(Properties.Settings.Default.BatchKey);
+                long newBatchID = access.GenerateNewBatchID();
 
                 foreach (long request in row.Requests)
                 {
