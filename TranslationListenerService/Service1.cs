@@ -19,18 +19,37 @@ namespace TranslationListenerService
     {
         private LocalizationDatabaseAccessor access;
         private XMLSerializer serializer;
+        private FileSystemWatcher watcher;
 
         public TranslationListener()
         {
             InitializeComponent();
 
+            //Create new database access object
             access = new LocalizationDatabaseAccessor(
                 connectionString: Properties.Settings.Default.ConnectionString,
                 storedProcedureName: Properties.Settings.Default.StoredProcedureName,
                 tableName: Properties.Settings.Default.TableName,
                 primaryKey: Properties.Settings.Default.PrimaryKey);
 
+            //Create new XML Serialization object
             serializer = new XMLSerializer(access);
+
+
+            // Create a new FileSystemWatcher and set its properties.
+            watcher = new FileSystemWatcher();
+            watcher.Path = Properties.Settings.Default.HandbackFolderPath;
+            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.CreationTime;
+            watcher.Filter = "*.xml";
+
+            // Add event handlers.
+            //watcher.Changed += new FileSystemEventHandler(OnChanged);
+            watcher.Created += new FileSystemEventHandler(OnChanged);
+            //watcher.Deleted += new FileSystemEventHandler(OnChanged);
+            //watcher.Renamed += new RenamedEventHandler(OnRenamed);
+
+            // Begin watching.
+            watcher.EnableRaisingEvents = true;
         }
 
         protected override void OnStart(string[] args)
@@ -47,13 +66,19 @@ namespace TranslationListenerService
         private void ServiceTimer_Tick(object sender, EventArgs e)
         {
             ProcessQueue();
-            ScanHandBack();
         }
 
 
 
 
         #region "Queue processing"
+        private struct BatchInfo
+        {
+            public long BatchID;
+            public int InputLCID;
+            public int OutputLCID;
+        }
+
         private void ProcessQueue()
         {
             DataTable UnAssignedRequests = access.DataBaseToDataTable();
@@ -93,13 +118,6 @@ namespace TranslationListenerService
             return newBatchIDs;
         }
 
-
-        private struct BatchInfo
-        {
-            public long BatchID;
-            public int InputLCID;
-            public int OutputLCID;
-        }
 
         private List<BatchInfo> newFindBatches(DataTable table)
         {
@@ -159,15 +177,19 @@ namespace TranslationListenerService
 
 
 
+        #region "Handback processing"
 
 
-
-
-        private void ScanHandBack()
+        private void OnChanged(object source, FileSystemEventArgs e)
         {
 
+
+            serializer.XmlFileToDataBase(e.FullPath);
         }
 
+
+
+        #endregion
 
     }
 }
