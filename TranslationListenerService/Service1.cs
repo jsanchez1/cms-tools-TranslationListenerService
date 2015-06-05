@@ -12,6 +12,7 @@ using LocalizationDatabaseAccess;
 using XMLSerialization;
 using System.Data.SqlClient;
 using System.IO;
+using System.Threading;
 
 namespace TranslationListenerService
 {
@@ -46,21 +47,22 @@ namespace TranslationListenerService
             //watcher.Changed += new FileSystemEventHandler(OnChanged);
             watcher.Created += new FileSystemEventHandler(OnChanged);
             //watcher.Deleted += new FileSystemEventHandler(OnChanged);
-            //watcher.Renamed += new RenamedEventHandler(OnRenamed);
-
-            // Begin watching.
-            watcher.EnableRaisingEvents = true;
+            //watcher.Renamed += new RenamedEventHandler(OnRenamed);            
         }
 
         protected override void OnStart(string[] args)
         {
             ServiceTimer.Interval = Properties.Settings.Default.ServiceIntervalInMinutes * (1000 * 60);
             ServiceTimer.Start();
+
+            watcher.EnableRaisingEvents = true;
         }
 
         protected override void OnStop()
         {
             ServiceTimer.Stop();
+
+            watcher.EnableRaisingEvents = false;
         }
 
         private void ServiceTimer_Tick(object sender, EventArgs e)
@@ -178,13 +180,44 @@ namespace TranslationListenerService
 
 
         #region "Handback processing"
-
-
+        
         private void OnChanged(object source, FileSystemEventArgs e)
         {
+            if (IsFileReady(e.FullPath))
+                serializer.XmlFileToDataBase(e.FullPath, serializer.GetBatchID(e.FullPath, Properties.Settings.Default.BatchKey));
+        }
+        
+        private bool IsFileReady(String sFilename, int waitSeconds = 10)
+        {
+            DateTime start = DateTime.Now;
+            // If the file can be opened for exclusive access it means that the file
+            // is no longer locked by another process.
+            while (DateTime.Now < start.AddSeconds(waitSeconds))
+            {
+                try
+                {
+                    using (FileStream inputStream = File.Open(sFilename, FileMode.Open, FileAccess.Read, FileShare.None))
+                    {
+                        if (inputStream.Length > 0)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            //return false;
+                        }
 
+                    }
+                }
+                catch (Exception)
+                {
+                    //return false;
+                }
 
-            serializer.XmlFileToDataBase(e.FullPath);
+                Thread.Sleep(1000);
+            }
+
+            return false;
         }
 
 
