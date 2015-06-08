@@ -6,7 +6,7 @@
     <ProjectGuid>{D6EAF40E-E5A2-4057-82DF-B8F58A48CF91}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LocalizationUnitTestProject</RootNamespace>
+    <RootNamespace>LocalizationUnitTests</RootNamespace>
     <AssemblyName>UnitTestProject1</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

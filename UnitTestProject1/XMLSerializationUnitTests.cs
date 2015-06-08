@@ -5,7 +5,7 @@ using XMLSerialization;
 using LocalizationDatabaseAccess;
 
 
-namespace LocalizationUnitTestProject
+namespace LocalizationUnitTests
 {
     public static class TestHelp
     {
@@ -210,6 +210,120 @@ namespace LocalizationUnitTestProject
 
             Assert.Fail("No exception was thrown.");          
         }
+
+
+        [TestMethod]
+        public void XmlFileToDataBase_NullXMLPath()
+        {
+            try
+            {
+                TestHelp.PopulateXMLFile();
+
+                XMLSerializer serializer = new XMLSerializer(TestHelp.testconnectionstring, TestHelp.teststoredprocedurename, TestHelp.testtableName, TestHelp.testprimarykey, TestHelp.testbatchcolumn);
+
+                serializer.XmlFileToDataBase(
+                    path: null);
+            }
+            catch (XMLSerializer.XMLSerializerException ex)
+            {
+                StringAssert.Contains(ex.Message, XMLSerializer.XMLSerializerException.XMLPathInvalid);
+                return;
+            }
+
+            Assert.Fail("No exception was thrown.");
+        }
+
+        [TestMethod]
+        public void XmlFileToDataBase_NullConnectionString()
+        {
+            try
+            {
+                TestHelp.PopulateXMLFile();
+
+                XMLSerializer serializer = new XMLSerializer(null, TestHelp.teststoredprocedurename, TestHelp.testtableName, TestHelp.testprimarykey, TestHelp.testbatchcolumn);
+
+                serializer.XmlFileToDataBase(
+                    path: TestHelp.testpath);
+            }
+            catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
+            {
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.SQLConnectionInvalid);
+                return;
+            }
+
+            Assert.Fail("No exception was thrown.");
+        }
+
+
+
+        [TestMethod]
+        public void XmlFileToDataBase_NullTableName()
+        {
+            try
+            {
+                TestHelp.PopulateXMLFile();
+
+                XMLSerializer serializer = new XMLSerializer(TestHelp.testconnectionstring, TestHelp.teststoredprocedurename, null, TestHelp.testprimarykey, TestHelp.testbatchcolumn);
+
+                serializer.XmlFileToDataBase(
+                    path: TestHelp.testpath);
+            }
+            catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
+            {
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.SQLTableInvalid);
+                return;
+            }
+
+            Assert.Fail("No exception was thrown.");
+        }
+
+        [TestMethod]
+        public void XmlFileToDataBase_NullPrimaryKey()
+        {
+            try
+            {
+                TestHelp.PopulateXMLFile();
+
+                XMLSerializer serializer = new XMLSerializer(TestHelp.testconnectionstring, TestHelp.teststoredprocedurename, TestHelp.testtableName, null, TestHelp.testbatchcolumn);
+
+
+                serializer.XmlFileToDataBase(
+                    path: TestHelp.testpath);
+            }
+            catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
+            {
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.SQLPrimaryKeyInvalid);
+                return;
+            }
+
+            Assert.Fail("No exception was thrown.");
+        }
+
+
+
+        [TestMethod]
+        public void XmlFileToDataBase_NullBatchIDColumn()
+        {
+            try
+            {
+                TestHelp.PopulateXMLFile();
+
+                XMLSerializer serializer = new XMLSerializer(TestHelp.testconnectionstring, TestHelp.teststoredprocedurename, TestHelp.testtableName, TestHelp.testprimarykey, null);
+
+
+                serializer.XmlFileToDataBase(
+                    path: TestHelp.testpath);
+            }
+            catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
+            {
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.exceptionMessage);
+                return;
+            }
+
+            Assert.Fail("No exception was thrown.");
+        }
+
+
 
     }
 }
