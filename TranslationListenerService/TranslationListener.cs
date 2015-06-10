@@ -82,7 +82,7 @@ namespace TranslationListenerService
             public int OutputLCID;
         }
 
-        private void ProcessQueue()
+        public void ProcessQueue()
         {
             DataTable UnAssignedRequests = access.DataBaseToDataTable();
 

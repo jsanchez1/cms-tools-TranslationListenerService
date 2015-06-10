@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TranslationListenerService;
 using XMLSerialization;
 using LocalizationDatabaseAccess;
 
@@ -142,9 +141,9 @@ namespace LocalizationUnitTests
             {
                 serializer.DataBaseToXMLFile(TestHelp.testpath);
             }
-            catch (XMLSerializer.XMLSerializerException ex)
+            catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
             {
-                StringAssert.Contains(ex.Message, XMLSerializer.XMLSerializerException.exceptionMessage);
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.SQLPrimaryKeyInvalid);
                 return;
             }
 
@@ -161,9 +160,9 @@ namespace LocalizationUnitTests
             {
                 serializer.DataBaseToXMLFile(TestHelp.testpath);
             }
-            catch (XMLSerializer.XMLSerializerException ex)
+            catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
             {
-                StringAssert.Contains(ex.Message, XMLSerializer.XMLSerializerException.exceptionMessage);
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.SQLBatchIDInvalid);
                 return;
             }
 
@@ -316,7 +315,7 @@ namespace LocalizationUnitTests
             }
             catch (LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException ex)
             {
-                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.exceptionMessage);
+                StringAssert.Contains(ex.Message, LocalizationDatabaseAccessor.LocalizationDatabaseAccessorException.SQLBatchIDInvalid);
                 return;
             }
 
