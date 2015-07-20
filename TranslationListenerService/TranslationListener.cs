@@ -22,14 +22,6 @@ namespace TranslationListenerService
         private XMLSerializer serializer;
         private FileSystemWatcher watcher;
 
-        private struct BatchInfo
-        {
-            public long BatchID;
-            public int InputLCID;
-            public int OutputLCID;
-        }
-
-
         public TranslationListener()
         {
             InitializeComponent();
@@ -48,8 +40,9 @@ namespace TranslationListenerService
             watcher.Filter = "*.xml";
 
             // Add event handlers.
-            //watcher.Changed += new FileSystemEventHandler(OnChanged);
             watcher.Created += new FileSystemEventHandler(OnChanged);
+
+            //watcher.Changed += new FileSystemEventHandler(OnChanged);
             //watcher.Deleted += new FileSystemEventHandler(OnChanged);
             //watcher.Renamed += new RenamedEventHandler(OnRenamed);            
         }
@@ -77,27 +70,26 @@ namespace TranslationListenerService
 
         #region "Queue processing"
 
-
+        //FIX
         public void ProcessQueue()
         {
             DataTable UnAssignedRequests = access.DataBaseToDataTable();
 
             if (UnAssignedRequests.Rows.Count > 0)
             {
-                DataTable AssignedRequests = AssignBatches(UnAssignedRequests);
+                DataTable AssignedRequests = access.AssignBatches(UnAssignedRequests);
                 access.UpdateDataBase(AssignedRequests);
 
-                FindBatches(AssignedRequests);
-
-                foreach (BatchInfo batch in FindBatches(AssignedRequests))
+                foreach (LocalizationDatabaseAccessor.BatchInfo batch in access.GetBatches(AssignedRequests))
                 {
                     serializer.DataBaseToXMLFile(GetXMLOutputPath(batch), batch.BatchID);
+                    access.UpdateBatch(batch.BatchID, batch.BatchSize, GetXMLOutputPath(batch), "Submitted");
                 }
             }
         }
 
 
-        private string GetXMLOutputPath(BatchInfo batch)
+        private string GetXMLOutputPath(LocalizationDatabaseAccessor.BatchInfo batch)
         {
             //"<TargetLangId>_<SourceLangID>_<BatchID>_<DateStamp>.xml"
             string filename = String.Format("{0}_{1}_{2}_{3:MM-dd-yyyy}", batch.OutputLCID, batch.InputLCID, batch.BatchID, DateTime.Now);
@@ -105,58 +97,6 @@ namespace TranslationListenerService
             string path = Path.ChangeExtension(Path.Combine(Properties.Settings.Default.HandoffFolderPath, filename), "xml");
 
             return path;
-        }
-
-        
-        private List<BatchInfo> FindBatches(DataTable table)
-        {
-
-            List<BatchInfo> newBatchIDs = (from DataRow row in table.Rows
-                                           select new BatchInfo
-                                           {
-                                               BatchID = (long)row[access.BatchKey],
-                                               InputLCID = (int)row[access.InputLCIDKey],
-                                               OutputLCID = (int)row[access.OuputLCIDKey]
-                                           }).Distinct().ToList();
-
-            return newBatchIDs;
-        }
-        
-        private DataTable AssignBatches(DataTable table)
-        {
-            var simplifiedList = from DataRow row in table.Rows
-                                 select new
-                                 {
-                                     RequestID = row[access.RequestKey],
-                                     InputLCID = row[access.InputLCIDKey],
-                                     OutputLCID = row[access.OuputLCIDKey]
-                                 };
-
-            var groupedByLCID = from row in simplifiedList
-                                group row.RequestID by new
-                                {
-                                    row.InputLCID,
-                                    row.OutputLCID
-                                } into newList
-                                select new
-                                {
-                                    InputLCID = newList.Key.InputLCID,
-                                    OutputLCID = newList.Key.OutputLCID,
-                                    Requests = newList.ToList()
-                                };
-
-            foreach (var row in groupedByLCID)
-            {
-                long newBatchID = access.GenerateNewBatchID();
-
-                foreach (long request in row.Requests)
-                {
-                    table.Rows.Find(request)[access.BatchKey] = newBatchID;
-                }
-
-            }
-
-            return table;
         }
 
         #endregion
