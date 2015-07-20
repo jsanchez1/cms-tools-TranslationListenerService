@@ -34,7 +34,7 @@ namespace LocalizationDevTesting
 
         static void ProcessQueue()
         {
-            DataTable UnAssignedRequests = access.DataBaseToDataTable();
+            DataTable UnAssignedRequests = access.GetRequestQueue();
 
             if (UnAssignedRequests.Rows.Count > 0)
             {

@@ -73,12 +73,12 @@ namespace TranslationListenerService
         //FIX
         public void ProcessQueue()
         {
-            DataTable UnAssignedRequests = access.DataBaseToDataTable();
+            DataTable UnAssignedRequests = access.GetRequestQueue();
 
             if (UnAssignedRequests.Rows.Count > 0)
             {
                 DataTable AssignedRequests = access.AssignBatches(UnAssignedRequests);
-                access.UpdateDataBase(AssignedRequests);
+                access.UpdateRequests(AssignedRequests);
 
                 foreach (LocalizationDatabaseAccessor.BatchInfo batch in access.GetBatches(AssignedRequests))
                 {
